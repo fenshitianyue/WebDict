@@ -1,0 +1,17 @@
+void Handler404(int new_sock){
+  //构造一个错误处理的页面,严格遵守HTTP响应的格式
+  const char* first_line = "HTTP/1.1 404 Not Found\n"; 
+  const char *blank_line = "\n";
+  //body 部分的内容就是HTML
+  const char *body ="<head><meta http-equiv=\"content-type\""
+                    "content=\"text/html;charset=utf-8\"></head>" 
+                    "<h1>你的页面被喵星人吃掉了！！！</h1>";
+  char content_length[SIZE] = { 0 };
+  sprintf(content_length, "Content-Length: %lu\n", strlen(body));
+  send(new_sock, first_line, strlen(first_line), 0);
+  send(new_sock, content_length, strlen(content_length), 0);
+  send(new_sock, blank_line, strlen(blank_line), 0);
+  send(new_sock, body, strlen(body), 0);
+
+}
+
