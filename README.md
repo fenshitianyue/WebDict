@@ -24,12 +24,12 @@
 
 
 
-![demon1](fenshitianyue/WebDict/demon/p1.jpg)
+![demon1](/root/YAB/WebDict/demon/p1.jpg)
 
 
 
-![demon2](fenshitianyue/WebDict/demon/p2.jpg)
+![demon2](/root/YAB/WebDict/demon/p2.jpg)
 
 
 
-![demon3](fenshitianyue/WebDict/demon/p3.jpg)
+![demon3](/root/YAB/WebDict/demon/p3.jpg)
