@@ -24,12 +24,12 @@
 
 
 
-![demon1](/root/YAB/WebDict/demon/p1.jpg)
+![Image text](https://github.com/fenshitianyue/WebDict/blob/master/demon/p1.jpg)
 
 
 
-![demon2](/root/YAB/WebDict/demon/p2.jpg)
+![Image text](https://github.com/fenshitianyue/WebDict/blob/master/demon/p2.jpg)
 
 
 
-![demon3](/root/YAB/WebDict/demon/p3.jpg)
+![Image text](https://github.com/fenshitianyue/WebDict/blob/master/demon/p3.jpg)
