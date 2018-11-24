@@ -24,12 +24,12 @@
 
 
 
-![1543075528929](C:\Users\搭错车\AppData\Roaming\Typora\typora-user-images\1543075528929.png)
+![1543075528929](/root/YAB/WebDict/demon/p1.jpg)
 
 
 
-![1543075591486](C:\Users\搭错车\AppData\Roaming\Typora\typora-user-images\1543075591486.png)
+![1543075591486](/root/YAB/WebDict/demon/p2.jpg)
 
 
 
-![1543075617442](C:\Users\搭错车\AppData\Roaming\Typora\typora-user-images\1543075617442.png)
+![1543075617442](/root/YAB/WebDict/demon/p3.jpg)
