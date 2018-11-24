@@ -24,12 +24,12 @@
 
 
 
-![1543075528929](/root/YAB/WebDict/demon/p1.jpg)
+![demon1](fenshitianyue/WebDict/demon/p1.jpg)
 
 
 
-![1543075591486](/root/YAB/WebDict/demon/p2.jpg)
+![demon2](fenshitianyue/WebDict/demon/p2.jpg)
 
 
 
-![1543075617442](/root/YAB/WebDict/demon/p3.jpg)
+![demon3](fenshitianyue/WebDict/demon/p3.jpg)
