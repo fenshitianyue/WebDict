@@ -83,6 +83,7 @@ def manage_english(cursor, buf):
                 Response(meaning)
 # 更新英文缓存
                 update_english_buf(buf, meaning)
+                break
         except:
             Error404()
 
