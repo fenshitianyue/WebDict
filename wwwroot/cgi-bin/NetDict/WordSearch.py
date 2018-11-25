@@ -9,12 +9,14 @@ ll = ctypes.cdll.LoadLibrary
 lib = ll("./libcgibase.so")
 
 def Error404():
-  print "<h1>服务器怕是偷懒了</h1>"
-  print "<br>"
-  print "<h3>请联系这个人类，QQ：1262167092</h3>"
+    print "<h1>服务器怕是偷懒了</h1>"
+    print "<br>"
+    print "<h3>请联系这个人类，QQ：1262167092</h3>"
 
 def FindEmpty():
-    pass
+    print "<h1>抱歉，未找到查询词~</h1>"
+    print "<br>"
+    print "<h3>请联系这个人类，QQ：1262167092</h3>"
 
 def Response(resp):
     print "<!DOCTYPE HTML>"
@@ -34,9 +36,12 @@ def Response(resp):
     print "</body>"
     print "</html>"
 
+def updata_buf():
+    pass
 
 def manage_english(cursor, buf):
-    sql = "select * from mydict where word = %s" % (buf)
+#从英文缓存中查找
+    sql = "select * from mydict where word = '%s'" % (buf)
     try:
         cursor.execute(sql)
         if cursor.rowcount == 0:
@@ -44,18 +49,23 @@ def manage_english(cursor, buf):
         results = cursor.fetchall()
         for row in results:
             meaning = row[1]
+#更新英文缓存
             Response(meaning)
     except:
         Error404()
 
 def manage_chinese(cursor, buf):
+#从中文缓存中查找
     pass
-
 
 if __name__ == "__main__":
     db = pymysql.connect("localhost", "root", "nihao", "Dict", charset = "utf8")
-
     cursor = db.cursor()
+#设置中英文缓存
+
+#设置 MySQL 默认字符集，保证浏览器可以显示中文
+#TODO
+
 #获取页面请求->查询词
 
     GetQueryStringPy = lib.GetQueryString
