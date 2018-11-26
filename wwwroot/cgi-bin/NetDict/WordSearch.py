@@ -12,8 +12,39 @@ lib = ll("./libcgibase.so")
 EnglishCache = {}
 ChineseCache = {}
 
+def add_english_dict(line):
+    list_str = line.split(" ")
+    word = list_str[0]
+    meaning = list_str[1]
+    dict_tmp = {word : meaning}
+    EnglishCache.update(dict_tmp)
+
+def add_chinese_dict(line):
+    list_str = line.split(" ")
+    word = list_str[0]
+    meaning = list_str[1]
+    dict_tmp = {word : meaning}
+    ChineseCache.update(dict_tmp)
+
 def ReadCache():
-    pass
+    fp_e = open("./cache/EnglishCache", "r")
+    fp_c = open("./cache/ChineseCache", "r")
+#update english cache
+    while True:
+        line = fp_e.readline()
+        if line:
+            add_english_dict(line)
+        else:
+            break
+#update chinese cache
+    while True:
+        line = fp_e.readline()
+        if line:
+            add_chinese_dict(line)
+        else:
+            break
+    fp_e.close()
+    fp_c.close()
 
 def WriteCache():
     pass
