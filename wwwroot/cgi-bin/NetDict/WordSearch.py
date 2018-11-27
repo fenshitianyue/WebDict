@@ -1,9 +1,9 @@
 #!/usr/bin/python
 #coding:UTF-8
 
-import pymysql # 数据库
-import chardet # 判断字符集
-import ctypes # 调用C静态库接口
+import pymysql  # 数据库
+import chardet  # 判断字符集
+import ctypes  # 调用C静态库接口
 
 ll = ctypes.cdll.LoadLibrary
 lib = ll("./libcgibase.so")
@@ -16,29 +16,27 @@ def add_english_dict(line):
     list_str = line.split(" ")
     word = list_str[0]
     meaning = list_str[1]
-    dict_tmp = {word : meaning}
-    EnglishCache.update(dict_tmp)
+    EnglishCache[word] = meaning
 
 def add_chinese_dict(line):
     list_str = line.split(" ")
     word = list_str[0]
     meaning = list_str[1]
-    dict_tmp = {word : meaning}
-    ChineseCache.update(dict_tmp)
+    ChineseCache[word] = meaning
 
-def ReadCache():
+def read_cache():
     fp_e = open("./cache/EnglishCache", "r")
     fp_c = open("./cache/ChineseCache", "r")
-#update english cache
+# update english cache
     while True:
         line = fp_e.readline()
         if line:
             add_english_dict(line)
         else:
             break
-#update chinese cache
+# update chinese cache
     while True:
-        line = fp_e.readline()
+        line = fp_c.readline()
         if line:
             add_chinese_dict(line)
         else:
@@ -46,7 +44,7 @@ def ReadCache():
     fp_e.close()
     fp_c.close()
 
-def WriteCache():
+def write_cache():
     pass
 
 def Error404():
@@ -90,12 +88,12 @@ def find_chinese_cache(buf):
     return 'null'
 
 def update_english_buf(buf, meaning):
-    EnglishCache['buf'] = meaning
-    WriteCache()
+    EnglishCache[buf] = meaning
+    write_cache()
 
 def update_chinese_buf(buf, meaning):
-    ChineseCache['buf'] = meaning
-    WriteCache()
+    ChineseCache[buf] = meaning
+    write_cache()
 
 def manage_english(cursor, buf):
 # 从英文缓存中查找
@@ -120,17 +118,24 @@ def manage_english(cursor, buf):
 
 def manage_chinese(cursor, buf):
 # 从中文缓存中查找
-    pass
+    meaning = find_chinese_cache(buf)
+    if meaning != 'null':
+        Response(meaning)
+    else:
+        pass
+
 
 if __name__ == "__main__":
 # 将缓存加载到内存
-    ReadCache()
+    read_cache()
+# 连接数据库
     db = pymysql.connect("localhost", "root", "nihao", "Dict", charset = "utf8")
+#获取控制句柄
     cursor = db.cursor()
 
 # 获取页面请求->查询词
     GetQueryStringPy = lib.GetQueryString
-    buf = "" * 30 # 设置缓冲区容量
+    buf = "" * 30  # 设置缓冲区容量
     ret = GetQueryStringPy(buf)
     if ret < 0:
         Error404()
@@ -143,6 +148,7 @@ if __name__ == "__main__":
         manage_english(cursor, buf)
     else:
         manage_chinese(cursor, buf)
+# 关闭与数据库的连接
     db.close()
 
 
