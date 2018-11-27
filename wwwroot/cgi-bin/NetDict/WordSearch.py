@@ -8,20 +8,22 @@ import ctypes  # 调用C静态库接口
 ll = ctypes.cdll.LoadLibrary
 lib = ll("./libcgibase.so")
 
+# 初步将缓存的容量定为 50 个词
+
 # 设置中英文缓存
 EnglishCache = {}
 ChineseCache = {}
 
 def add_english_dict(line):
     list_str = line.split(" ")
-    word = list_str[0]
-    meaning = list_str[1]
+    word = list_str[0].strip("\n")
+    meaning = list_str[1].strip("\n")
     EnglishCache[word] = meaning
 
 def add_chinese_dict(line):
     list_str = line.split(" ")
-    word = list_str[0]
-    meaning = list_str[1]
+    word = list_str[0].strip("\n")
+    meaning = list_str[1].strip("\n")
     ChineseCache[word] = meaning
 
 def read_cache():
@@ -44,8 +46,33 @@ def read_cache():
     fp_e.close()
     fp_c.close()
 
-def write_cache():
-    pass
+def write_english_cache():
+    fp = open("./cache/EnglishCache", "w")
+    num = len(EnglishCache) - 50
+# 如果缓存中的元素个数超过指定缓存容量，则随机删除超过容量的元素
+    if num > 0:
+        for word in EnglishCache.key():
+            del EnglishCache[word]
+            num = num - 1
+            if num == 0:
+                break
+    for word, meaning in EnglishCache.items():
+        fp.write(word + " " + meaning + "\n")
+    fp.close()
+
+def write_chinese_cache():
+    fp = open("./cache/ChineseCache", "w")
+    num = len(ChineseCache) - 50
+# 如果缓存中的元素个数超过指定缓存容量，则随机删除超过容量的元素
+    if num > 0:
+        for word in ChineseCache.key():
+            del ChineseCache[word]
+            num = num - 1
+            if num == 0:
+                break
+    for word, meaning in ChineseCache.items():
+        fp.write(word + " " + meaning + "\n")
+    fp.close()
 
 def Error404():
     print "<h1>服务器怕是偷懒了</h1>"
@@ -89,11 +116,11 @@ def find_chinese_cache(buf):
 
 def update_english_buf(buf, meaning):
     EnglishCache[buf] = meaning
-    write_cache()
+    write_english_cache()
 
 def update_chinese_buf(buf, meaning):
     ChineseCache[buf] = meaning
-    write_cache()
+    write_chinese_cache()
 
 def manage_english(cursor, buf):
 # 从英文缓存中查找
@@ -106,13 +133,14 @@ def manage_english(cursor, buf):
             cursor.execute(sql)
             if cursor.rowcount == 0:
                 FindEmpty()
-            results = cursor.fetchall()
-            for row in results:
-                meaning = row[1]
-                Response(meaning)
+            else:
+                results = cursor.fetchall()
+                for row in results:
+                    meaning = row[1]
+                    Response(meaning)
 # 更新英文缓存
-                update_english_buf(buf, meaning)
-                break
+                    update_english_buf(buf, meaning)
+                    break
         except:
             Error404()
 
@@ -130,7 +158,7 @@ if __name__ == "__main__":
     read_cache()
 # 连接数据库
     db = pymysql.connect("localhost", "root", "nihao", "Dict", charset = "utf8")
-#获取控制句柄
+# 获取控制句柄
     cursor = db.cursor()
 
 # 获取页面请求->查询词
