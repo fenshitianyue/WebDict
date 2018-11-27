@@ -3,10 +3,12 @@
 
 import pymysql  # 数据库
 import chardet  # 判断字符集
-import ctypes  # 调用C静态库接口
+# import ctypes  # 调用C静态库接口
+import os # 调用系统服务
+import re # 操纵字符串的服务
 
-ll = ctypes.cdll.LoadLibrary
-lib = ll("./libcgibase.so")
+# ll = ctypes.cdll.LoadLibrary
+# lib = ll("../common/libcgibase.so")
 
 # 初步将缓存的容量定为 50 个词
 
@@ -109,10 +111,7 @@ def find_english_cache(buf):
     return 'null'
 
 def find_chinese_cache(buf):
-    for word, meaning in ChineseCache.items():
-        if word == buf:
-            return meaning
-    return 'null'
+    pass
 
 def update_english_buf(buf, meaning):
     EnglishCache[buf] = meaning
@@ -145,6 +144,7 @@ def manage_english(cursor, buf):
             Error404()
 
 def manage_chinese(cursor, buf):
+
 # 从中文缓存中查找
     meaning = find_chinese_cache(buf)
     if meaning != 'null':
@@ -152,8 +152,20 @@ def manage_chinese(cursor, buf):
     else:
         pass
 
+def get_query_string(buf):
+
+# 从环境变量中读取方法
+    method = os.environ["REQUEST_METHOD"]
+# 如果是GET方法，再从环境变量中读取 QUERY_STRING
+    if method.upper() == "GET":
+        query_string = os.environ["QUERY_STRING"]
+#        buf = query_string
+    else:
+        content_length = os.environ["CONTENT_LENGTH"]
+
 
 if __name__ == "__main__":
+
 # 将缓存加载到内存
     read_cache()
 # 连接数据库
@@ -162,9 +174,10 @@ if __name__ == "__main__":
     cursor = db.cursor()
 
 # 获取页面请求->查询词
-    GetQueryStringPy = lib.GetQueryString
-    buf = "" * 30  # 设置缓冲区容量
-    ret = GetQueryStringPy(buf)
+#   GetQueryStringPy = lib.GetQueryString
+#   ret = GetQueryStringPy(buf)
+    buf = " " * 30  # 设置缓冲区容量
+    ret = get_query_string(buf)
     if ret < 0:
         Error404()
         db.close()
