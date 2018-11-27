@@ -5,7 +5,8 @@ import pymysql  # 数据库
 import chardet  # 判断字符集
 # import ctypes  # 调用C静态库接口
 import os # 调用系统服务
-import re # 操纵字符串的服务
+import sys # 调用系统服务
+import string # 字符串操作
 
 # ll = ctypes.cdll.LoadLibrary
 # lib = ll("../common/libcgibase.so")
@@ -144,7 +145,6 @@ def manage_english(cursor, buf):
             Error404()
 
 def manage_chinese(cursor, buf):
-
 # 从中文缓存中查找
     meaning = find_chinese_cache(buf)
     if meaning != 'null':
@@ -153,19 +153,21 @@ def manage_chinese(cursor, buf):
         pass
 
 def get_query_string(buf):
-
 # 从环境变量中读取方法
     method = os.environ["REQUEST_METHOD"]
 # 如果是GET方法，再从环境变量中读取 QUERY_STRING
     if method.upper() == "GET":
         query_string = os.environ["QUERY_STRING"]
-#        buf = query_string
+        buf[0] = query_string
+# 如果是POST方法，从环境变量中获取content-length，再
+# 根据其数值从标准输入中读取数据
     else:
         content_length = os.environ["CONTENT_LENGTH"]
-
+        buf[0] = sys.stdin.readline(string.atoi(content_length))
+        buf[0] = buf[0] + "\0"
+    return 0
 
 if __name__ == "__main__":
-
 # 将缓存加载到内存
     read_cache()
 # 连接数据库
@@ -176,19 +178,23 @@ if __name__ == "__main__":
 # 获取页面请求->查询词
 #   GetQueryStringPy = lib.GetQueryString
 #   ret = GetQueryStringPy(buf)
-    buf = " " * 30  # 设置缓冲区容量
+    buf_tmp = " " * 30  # 设置缓冲区容量
+    buf = []
+    buf.append(buf_tmp)
+# 要在函数内部更改函数外部变量的值，只能传入固定类型的参数，所以这里封装了一层
+# 将缓冲区封装到了列表里
     ret = get_query_string(buf)
     if ret < 0:
         Error404()
         db.close()
 # 对接收到的数据进行字符串处理
-    buf = buf[2:]
+    buf[0] = buf[0][2:]
 # 进行中英文分流
-    coding = chardet.detect(buf)
+    coding = chardet.detect(buf[0])
     if coding['encoding'] == "ascii":
-        manage_english(cursor, buf)
+        manage_english(cursor, buf[0])
     else:
-        manage_chinese(cursor, buf)
+        manage_chinese(cursor, buf[0])
 # 关闭与数据库的连接
     db.close()
 
