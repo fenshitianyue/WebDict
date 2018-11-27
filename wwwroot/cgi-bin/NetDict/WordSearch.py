@@ -30,8 +30,8 @@ def add_chinese_dict(line):
     ChineseCache[word] = meaning
 
 def read_cache():
-    fp_e = open("./cache/EnglishCache", "r")
-    fp_c = open("./cache/ChineseCache", "r")
+    fp_e = open("/root/YAB/web_dict/wwwroot/cgi-bin/NetDict/cache/EnglishCache", "r")
+    fp_c = open("/root/YAB/web_dict/wwwroot/cgi-bin/NetDict/cache/ChineseCache", "r")
 # update english cache
     while True:
         line = fp_e.readline()
@@ -50,7 +50,7 @@ def read_cache():
     fp_c.close()
 
 def write_english_cache():
-    fp = open("./cache/EnglishCache", "w")
+    fp = open("/root/YAB/web_dict/wwwroot/cgi-bin/NetDict/cache/EnglishCache", "w")
     num = len(EnglishCache) - 50
 # 如果缓存中的元素个数超过指定缓存容量，则随机删除超过容量的元素
     if num > 0:
@@ -64,7 +64,7 @@ def write_english_cache():
     fp.close()
 
 def write_chinese_cache():
-    fp = open("./cache/ChineseCache", "w")
+    fp = open("cache/ChineseCache", "w")
     num = len(ChineseCache) - 50
 # 如果缓存中的元素个数超过指定缓存容量，则随机删除超过容量的元素
     if num > 0:
@@ -107,7 +107,7 @@ def Response(resp):
 
 def find_english_cache(buf):
     for word, meaning in EnglishCache.items():
-        if word == buf:
+        if word == buf[0]:
             return meaning
     return 'null'
 
@@ -115,20 +115,20 @@ def find_chinese_cache(buf):
     pass
 
 def update_english_buf(buf, meaning):
-    EnglishCache[buf] = meaning
+    EnglishCache[buf[0]] = meaning
     write_english_cache()
 
 def update_chinese_buf(buf, meaning):
-    ChineseCache[buf] = meaning
+    ChineseCache[buf[0]] = meaning
     write_chinese_cache()
 
 def manage_english(cursor, buf):
 # 从英文缓存中查找
-    meaning = find_english_cache(buf)
+    meaning = find_english_cache(buf[0])
     if meaning != 'null':
         Response(meaning)
     else:
-        sql = "select * from mydict where word = '%s'" % (buf)
+        sql = "select * from mydict where word = '%s'" % (buf[0]) # 下来测一测这里，可能有bug
         try:
             cursor.execute(sql)
             if cursor.rowcount == 0:
@@ -139,14 +139,14 @@ def manage_english(cursor, buf):
                     meaning = row[1]
                     Response(meaning)
 # 更新英文缓存
-                    update_english_buf(buf, meaning)
+                    update_english_buf(buf[0], meaning)
                     break
         except:
             Error404()
 
 def manage_chinese(cursor, buf):
 # 从中文缓存中查找
-    meaning = find_chinese_cache(buf)
+    meaning = find_chinese_cache(buf[0])
     if meaning != 'null':
         Response(meaning)
     else:
