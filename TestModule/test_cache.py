@@ -20,10 +20,10 @@ def read_cache():
             add_dict(line)
         else:
             break
-    cache['external'] = "adj.外部的"
-    cache['inline'] = "n.内联"
-    cache['beauty'] = "n.美女"
-    cache['define'] = "v.定义"
+    cache['adj.外部的'] = "external"
+    cache['n.内联'] = "inline"
+    cache['n.美女'] = "beauty"
+    cache['v.定义'] = "define"
     fp.close()
 
 def write_cache():
@@ -61,7 +61,9 @@ def test_update_cache():
 
 if __name__ == "__main__":
     read_cache()
-    write_cache()
+    # write_cache()
     # test_update_cache()
+    # for word, meaning in cache.items():
+    #     print word + " : " + meaning
 
 
