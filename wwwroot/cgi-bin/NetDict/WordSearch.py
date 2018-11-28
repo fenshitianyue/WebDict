@@ -5,6 +5,7 @@ import pymysql  # 数据库
 import chardet  # 判断字符集
 # import ctypes  # 调用C静态库接口
 import os # 调用系统服务
+import re # 在中文缓存中使用模糊匹配
 import string # 字符串操作
 import sys # 调用系统服务
 reload(sys)
@@ -79,18 +80,6 @@ def write_chinese_cache():
         fp.write(word + " " + meaning + "\n")
     fp.close()
 
-def Error404(sql):
-    print "<h1>服务器可能又偷懒了~</h1>"
-    print "<br>"
-    print "<h3>请联系这个人类，QQ：1262167092</h3>"
-    # print sql
-
-def FindEmpty(sql):
-    print "<h1>抱歉，未找到查询词~</h1>"
-    print "<br>"
-    print "<h3>请联系这个人类，QQ：1262167092</h3>"
-    # print sql
-
 def Response(resp):
     print "<!DOCTYPE HTML>"
     print "<html>"
@@ -108,6 +97,14 @@ def Response(resp):
     print "</div>"
     print "</body>"
     print "</html>"
+
+def Error404():
+    error_content = "服务器可能又偷懒了~\n请联系这个人类，QQ：1262167092"
+    Response(error_content)
+
+def FindEmpty():
+    empty_content = "抱歉，未找到查询词~"
+    Response(empty_content)
 
 def find_english_cache(buf):
     for word, meaning in EnglishCache.items():
@@ -132,7 +129,6 @@ def manage_english(cursor, buf):
     if meaning != 'null':
         Response(meaning)
     else:
-#-----------------------------------------------------------------
         try:
             sql = "select * from mydict where word = '%s'" % (buf)
             cursor.execute(sql)
@@ -146,16 +142,15 @@ def manage_english(cursor, buf):
 # 更新英文缓存
                 update_english_buf(buf, meaning)
         except:
-            Error404(sql)
-#-----------------------------------------------------------------
+            Error404()
 
 def manage_chinese(cursor, buf):
-    # 从中文缓存中查找
-    meaning = find_chinese_cache(buf)
-    if meaning != 'null':
-        Response(meaning)
-    else:
-        pass
+#     # 从中文缓存中查找
+#     meaning = find_chinese_cache(buf)
+#     if meaning != 'null':
+#         Response(meaning)
+#     else:
+    pass
 
 def get_query_string(buf):
 # 从环境变量中读取方法
