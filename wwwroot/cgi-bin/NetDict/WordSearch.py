@@ -80,16 +80,16 @@ def write_chinese_cache():
     fp.close()
 
 def Error404(sql):
-    print "<h1>SQL问题</h1>"
+    print "<h1>服务器可能又偷懒了~</h1>"
     print "<br>"
-    # print "<h3>请联系这个人类，QQ：1262167092</h3>"
-    print sql
+    print "<h3>请联系这个人类，QQ：1262167092</h3>"
+    # print sql
 
 def FindEmpty(sql):
     print "<h1>抱歉，未找到查询词~</h1>"
     print "<br>"
-    # print "<h3>请联系这个人类，QQ：1262167092</h3>"
-    print sql
+    print "<h3>请联系这个人类，QQ：1262167092</h3>"
+    # print sql
 
 def Response(resp):
     print "<!DOCTYPE HTML>"
@@ -132,30 +132,21 @@ def manage_english(cursor, buf):
     if meaning != 'null':
         Response(meaning)
     else:
-        sql = "select * from mydict where word = '%s'" % (buf)
-        cursor.execute(sql)
-        if cursor.rowcount == 0:
-            FindEmpty()
-        else:
-            results = cursor.fetchall()
-            for row in results:
-                meaning = row[1]
-                Response(meaning)
 #-----------------------------------------------------------------
-#        try:
-#            sql = "select * from mydict where word = '%s'" % (buf)
-#            cursor.execute(sql)
-#            if cursor.rowcount == 0:
-#                FindEmpty()
-#            else:
-#                results = cursor.fetchall()
-#                for row in results:
-#                    meaning = row[1]
-#                    Response(meaning)
-#                # 更新英文缓存
-#                # update_english_buf(buf, meaning)
-#        except:
-#            Error404(sql)
+        try:
+            sql = "select * from mydict where word = '%s'" % (buf)
+            cursor.execute(sql)
+            if cursor.rowcount == 0:
+                FindEmpty()
+            else:
+                results = cursor.fetchall()
+                for row in results:
+                    meaning = row[1]
+                    Response(meaning)
+# 更新英文缓存
+                update_english_buf(buf, meaning)
+        except:
+            Error404(sql)
 #-----------------------------------------------------------------
 
 def manage_chinese(cursor, buf):
