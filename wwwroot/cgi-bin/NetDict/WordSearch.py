@@ -1,12 +1,14 @@
 #!/usr/bin/python
-#coding:UTF-8
+# coding:UTF-8
 
 import pymysql  # 数据库
 import chardet  # 判断字符集
 # import ctypes  # 调用C静态库接口
 import os # 调用系统服务
-import sys # 调用系统服务
 import string # 字符串操作
+import sys # 调用系统服务
+reload(sys)
+sys.setdefaultencoding('utf8')
 
 # ll = ctypes.cdll.LoadLibrary
 # lib = ll("../common/libcgibase.so")
@@ -77,15 +79,17 @@ def write_chinese_cache():
         fp.write(word + " " + meaning + "\n")
     fp.close()
 
-def Error404():
-    print "<h1>服务器怕是偷懒了</h1>"
+def Error404(sql):
+    print "<h1>SQL问题</h1>"
     print "<br>"
-    print "<h3>请联系这个人类，QQ：1262167092</h3>"
+    # print "<h3>请联系这个人类，QQ：1262167092</h3>"
+    print sql
 
-def FindEmpty():
+def FindEmpty(sql):
     print "<h1>抱歉，未找到查询词~</h1>"
     print "<br>"
-    print "<h3>请联系这个人类，QQ：1262167092</h3>"
+    # print "<h3>请联系这个人类，QQ：1262167092</h3>"
+    print sql
 
 def Response(resp):
     print "<!DOCTYPE HTML>"
@@ -107,7 +111,7 @@ def Response(resp):
 
 def find_english_cache(buf):
     for word, meaning in EnglishCache.items():
-        if word == buf[0]:
+        if word == buf:
             return meaning
     return 'null'
 
@@ -115,38 +119,48 @@ def find_chinese_cache(buf):
     pass
 
 def update_english_buf(buf, meaning):
-    EnglishCache[buf[0]] = meaning
+    EnglishCache[buf] = meaning
     write_english_cache()
 
 def update_chinese_buf(buf, meaning):
-    ChineseCache[buf[0]] = meaning
+    ChineseCache[buf] = meaning
     write_chinese_cache()
 
 def manage_english(cursor, buf):
 # 从英文缓存中查找
-    meaning = find_english_cache(buf[0])
+    meaning = find_english_cache(buf)
     if meaning != 'null':
         Response(meaning)
     else:
-        sql = "select * from mydict where word = '%s'" % (buf[0]) # 下来测一测这里，可能有bug
-        try:
-            cursor.execute(sql)
-            if cursor.rowcount == 0:
-                FindEmpty()
-            else:
-                results = cursor.fetchall()
-                for row in results:
-                    meaning = row[1]
-                    Response(meaning)
-# 更新英文缓存
-                    update_english_buf(buf[0], meaning)
-                    break
-        except:
-            Error404()
+        sql = "select * from mydict where word = '%s'" % (buf)
+        cursor.execute(sql)
+        if cursor.rowcount == 0:
+            FindEmpty()
+        else:
+            results = cursor.fetchall()
+            for row in results:
+                meaning = row[1]
+                Response(meaning)
+#-----------------------------------------------------------------
+#        try:
+#            sql = "select * from mydict where word = '%s'" % (buf)
+#            cursor.execute(sql)
+#            if cursor.rowcount == 0:
+#                FindEmpty()
+#            else:
+#                results = cursor.fetchall()
+#                for row in results:
+#                    meaning = row[1]
+#                    Response(meaning)
+#                # 更新英文缓存
+#                # update_english_buf(buf, meaning)
+#        except:
+#            Error404(sql)
+#-----------------------------------------------------------------
 
 def manage_chinese(cursor, buf):
-# 从中文缓存中查找
-    meaning = find_chinese_cache(buf[0])
+    # 从中文缓存中查找
+    meaning = find_chinese_cache(buf)
     if meaning != 'null':
         Response(meaning)
     else:
@@ -165,7 +179,7 @@ def get_query_string(buf):
         content_length = os.environ["CONTENT_LENGTH"]
         buf[0] = sys.stdin.readline(string.atoi(content_length))
         buf[0] = buf[0] + "\0"
-    return 0
+    return 1
 
 if __name__ == "__main__":
 # 将缓存加载到内存
@@ -179,13 +193,12 @@ if __name__ == "__main__":
 #   GetQueryStringPy = lib.GetQueryString
 #   ret = GetQueryStringPy(buf)
     buf_tmp = " " * 30  # 设置缓冲区容量
-    buf = []
-    buf.append(buf_tmp)
+    buf = [buf_tmp]
 # 要在函数内部更改函数外部变量的值，只能传入固定类型的参数，所以这里封装了一层
 # 将缓冲区封装到了列表里
     ret = get_query_string(buf)
     if ret < 0:
-        Error404()
+        # Error404()
         db.close()
 # 对接收到的数据进行字符串处理
     buf[0] = buf[0][2:]
