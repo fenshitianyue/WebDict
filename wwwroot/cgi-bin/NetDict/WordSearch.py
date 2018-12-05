@@ -7,6 +7,7 @@ import chardet  # 判断字符集
 import os # 调用系统服务
 ## import re # 在中文缓存中使用模糊匹配
 import string # 字符串操作
+import urllib2 # 解码浏览器发送的 escape格式 的请求字符串
 import sys # 调用系统服务
 reload(sys)
 sys.setdefaultencoding('utf8')
@@ -144,14 +145,13 @@ def manage_english(cursor, buf):
         except:
             Error404()
 
+#还有一些问题
 def manage_chinese(cursor, buf):
     try:
-        Response(buf)
         sql = "select * from mydict where match(`explain`) against('%s*' in boolean mode)" % (buf)
         cursor.execute(sql)
         if cursor.rowcount == 0:
-            # FindEmpty()
-            pass
+            FindEmpty()
         else:
             results = cursor.fetchall()
             result = ""
@@ -159,8 +159,6 @@ def manage_chinese(cursor, buf):
                 result_line = row[0] + '    ' + row[1] + '\n'
                 result = result + result_line
             result = result + '\n\n如果对结果不满意，可以尝试换一个查询词试试。\neg:实验搜不到，换试验试试~'
-            # Response(result)
-            pass
     except:
         Error404()
 
@@ -170,13 +168,17 @@ def get_query_string(buf):
     # 如果是GET方法，再从环境变量中读取 QUERY_STRING
     if method.upper() == "GET":
         query_string = os.environ["QUERY_STRING"]
-        buf[0] = query_string
-        Response(unicode(query_string[2:], 'utf-8')) #接收到的query_string的编码可能有问题
+# 将浏览器发送请求字符串从 escape 格式解码为 unicode 格式
+        buf[0] = urllib2.unquote(query_string).decode("utf-8")
+# 将 unicode 格式的字符串转换为 string 格式的字符串
+        buf[0] = buf[0].encode("utf-8")
 # 如果是POST方法，从环境变量中获取content-length，再
 # 根据其数值从标准输入中读取数据
     else:
         content_length = os.environ["CONTENT_LENGTH"]
         buf[0] = sys.stdin.readline(string.atoi(content_length))
+        buf[0] = urllib2.unquote(buf[0]).decode("utf-8")
+        buf[0] = buf[0].encode("utf-8")
         buf[0] = buf[0] + "\0"
     return 1
 
@@ -197,17 +199,15 @@ if __name__ == "__main__":
 # 将缓冲区封装到了列表里
     ret = get_query_string(buf)
     if ret < 0:
-        # Error404()
         db.close()
 # 对接收到的数据进行字符串处理
     buf[0] = buf[0][2:]
 # 进行中英文分流
     coding = chardet.detect(buf[0])
     if coding['encoding'] == "ascii":
-        # manage_english(cursor, buf[0])
-        pass
+       manage_english(cursor, buf[0])
     else:
-        manage_chinese(cursor, buf[0])
+       manage_chinese(cursor, buf[0])
 # 关闭与数据库的连接
     db.close()
 
