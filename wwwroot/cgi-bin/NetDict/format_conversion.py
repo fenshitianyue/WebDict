@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# 这是一份测试将mysql数据库表中数据按照指定格式导入本地文件的代码
+# 从数据库导出词典数据按照指定格式写入文件
 
 import pymysql
 import sys
@@ -18,7 +18,7 @@ def write_file():
 
 def find(cursor):
     try:
-        sql = "select * from test_dict"
+        sql = "select * from mydict"
         cursor.execute(sql)
         if cursor.rowcount == 0:
             print "查询为空"
@@ -32,7 +32,7 @@ def find(cursor):
 
 
 if __name__ == '__main__':
-    db = pymysql.connect("localhost", "root", "nihao.","test", charset = "utf8")
+    db = pymysql.connect("localhost", "root", "nihao.","Dict", charset = "utf8")
     cursor = db.cursor()
     find(cursor)
     write_file()
