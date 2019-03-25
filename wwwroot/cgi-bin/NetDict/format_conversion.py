@@ -1,8 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# 从数据库导出词典数据按照指定格式写入文件
-
 import pymysql
 import sys
 reload(sys)
@@ -11,9 +9,9 @@ sys.setdefaultencoding('utf8')
 base = {}
 
 def write_file():
-    fp = open("/home/zanda/Desktop/PythonCode/formatted_data", "w")
+    fp = open("/home/zanda/Desktop/PythonCode/new_formatted_data", "w+")
     for word, meaning in base.items():
-        fp.write(word + " " + meaning + "\n")
+        fp.write(word + "\3" + meaning + "\n")
     fp.close()
 
 def find(cursor):
