@@ -102,6 +102,10 @@ void Index::PrintInverted(){
   fp.close();
 }
 
+//计算权重的算法
+//这个函数是中文含义查询单词的核心算法，其逻辑可能会非常复杂。
+//这里我暂时用简单的逻辑实现
+//后面考虑用 逻辑回归算法 计算单词相关性得出权值
 int32_t Index::CalcWeight(const std::string& explain, const std::string& word){
   //这里的算法可能有问题，因为(单词长度/含义长度)长度小于1，用整数表示结果都为0
   //先考虑用(含义长度/单词长度)计算权值
@@ -127,17 +131,21 @@ void Index::SortInvertedList(){
   }
 }
 
+//这里和计算权重的算法密切相关
 bool Index::EqualWeight(Weight& w1, Weight& w2){
   if(w1.word_id == w1.word_id && w1.weight == w2.weight){
-    w1.weight += 1; //找到重复的分词结果后，增加其权重，暂且+1，后面根据具体数据再做更改
-    w2.weight += 1;
+    w1.weight -= 1; //找到重复的分词结果后，减少其权重，暂且-1，后面根据具体数据再做更改
+    w2.weight -= 1;
     return true;
   }
   return false;
 }
 
+//这个排序逻辑和权值的计算公式密切相关
+//由于我权值计算部分的计算公式是：含义长度 / 分词长度，所以相关性越低，得出的权值就越大，所以这里采用升序排序
+//即权值越大的，排得越靠后
 bool Index::CmpWeight(const Weight& w1, const Weight& w2){
-  return w1.weight > w2.weight;
+  return w1.weight < w2.weight;
 }
 
 bool Index::Save(const std::string& before_ouput_path, const std::string& after_output_path){
@@ -227,6 +235,20 @@ bool Index::Load(const std::string& before_intput_path, const std::string& after
   return true;
 }
 
-void Index::FindChinese(const std::string& word){
 
+bool Index::FindChinese(const std::string& word, std::string& result){
+  auto inverted_list = inverted_index_.find(word);
+  if(inverted_list != inverted_index_.end()){
+    //目前这里查找汉语对应单词的逻辑是只返回匹配到的倒排索引中的第一个单词
+    if(!inverted_list->second.empty()){
+      //have BUG
+      auto it = std::find_if(forward_index_.begin(), forward_index_.end(), FindArgv(inverted_list->second[0].word_id));
+      result = it->word;
+    }else{
+      return false;
+    }
+  }else{
+    return false;
+  }
+  return true;
 }

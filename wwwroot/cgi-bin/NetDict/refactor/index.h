@@ -5,9 +5,7 @@
 #include <string>
 #include <unordered_map>
 #include <algorithm>
-//#include <boost/algorithm/string.hpp>
 #include <cppjieba/Jieba.hpp>
-//#include <gflags/gflags.h>
 #include "util.hpp"
 
 
@@ -38,7 +36,7 @@ public:
   bool Build(const std::string& file_path);
   bool Save(const std::string& before_output_path, const std::string& after_output_path);
   bool Load(const std::string& before_intput_path, const std::string& after_input_path);
-  void FindChinese(const std::string& word);
+  bool FindChinese(const std::string& word, std::string& result);
   ///* test interface 
   void PrintForward();
   void PrintInverted();
@@ -55,6 +53,15 @@ private:
   std::vector<WordInfo> forward_index_;
   std::unordered_map<std::string, InvertedList> inverted_index_;
   cppjieba::Jieba jieba_;
+  /* std::find_if的仿函数，用于根据word_id查找正排索引中对应的word */
+  struct FindArgv{
+    FindArgv(int64_t word_id): id(word_id){} 
+    bool operator()(const WordInfo& w){
+      return w.word_id == id;
+    }
+    int64_t id;
+  };
+  /* end find */
   //暂停词
   DictUtil stop_word_dict_; 
   static Index* inst_;
