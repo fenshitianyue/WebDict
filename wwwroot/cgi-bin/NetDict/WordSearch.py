@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+import pymysql
 import string
 import ast
 import httplib
@@ -52,6 +53,28 @@ def get_query_string(buf):
         buf[0] = buf[0] + "\0"
     return 1
 
+def Error404():
+    error_content = "服务器又偷懒了~\n请联系这个人类：1262167092(QQ)"
+    Response(error_content)
+
+def FindEmpty():
+    empty_content = "抱歉，未找到查询词~"
+    Response(empty_content)
+
+def mysql_find(cursor, query):
+    try:
+        sql = "select * from mydict where word = '%s'" %(query)
+        cursor.execute(sql)
+        if cursor.rowcount == 0:
+            FindEmpty()
+        else:
+            results = cursor.fetchall()
+            for row in results:
+                meaning = row[1]
+                Response(meaning)
+    except:
+        Error404()
+
 appid = '20190415000288304'
 secreKey = '8fWMpQPCuC017jD3fB9R'
 
@@ -80,6 +103,10 @@ def manage(query, fromLang, toLang):
         httpClient.close()
 
 if __name__ == "__main__":
+    # 初始化数据库操作
+    db = pymysql.connect("localhost", "root", "nihao.", "Dict", charset = "utf8")
+    # 获取控制句柄
+    cursor = db.cursor()
     buf_n = " " * 30 #设置接收缓冲去容量
     query = [buf_n]
     ret = get_query_string(query)
@@ -87,7 +114,11 @@ if __name__ == "__main__":
       query[0] = query[0][2:]
       coding = chardet.detect(query[0])
       if coding['encoding'] == "ascii":
-          manage(query[0], 'en', 'zh')
-      else:
+          if len(query[0]) > 20: # 如果英文查询词长度超过20，则调用 translate API 进行查询
+            manage(query[0], 'en', 'zh')
+          else:
+            mysql_find(cursor, query[0]) # 否则在数据库中进行查询
+      else: # 中文查询目前调用 translate API 进行查询
           manage(query[0], 'zh', 'en')
+    db.close()
 
