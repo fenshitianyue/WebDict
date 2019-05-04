@@ -1,8 +1,7 @@
 # WebDict
-
-[![](https://img.shields.io/badge/release-v1.0-green.svg)](https://github.com/fenshitianyue/WebDict/releases)[![](https://img.shields.io/github/license/fenshitianyue/WebDict.svg)](<https://github.com/fenshitianyue/WebDict/blob/master/LICENSE>)[![codebeat_badage](https://img.shields.io/badge/codebeat-A-green.svg)](<https://codebeat.co/projects/github-com-fenshitianyue-webdict-master>)
-
-
+[![](https://img.shields.io/badge/release-v1.0-green.svg)](https://github.com/fenshitianyue/WebDict/releases)
+[![](https://img.shields.io/github/license/fenshitianyue/WebDict.svg)](<https://github.com/fenshitianyue/WebDict/blob/master/LICENSE>)
+[![codebeat badage](https://img.shields.io/badge/codebeat-A-green.svg)](<https://codebeat.co/projects/github-com-fenshitianyue-webdict-master>)
 
 ### 项目简介
 
@@ -10,7 +9,6 @@ WebDict是基于一个小型http框架开发的B/S架构的网络词典。这个
 
 这个项目还会不断优化，完善功能。
 
----
 
 ### 项目描述
 
