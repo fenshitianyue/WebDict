@@ -10,6 +10,8 @@
 #include <sys/stat.h>
 #include <pthread.h>
 #include <sys/wait.h>
+#include <signal.h>
+
 typedef struct sockaddr sockaddr;
 typedef struct sockaddr_in sockaddr_in;
 #define SIZE (1024 * 10)
@@ -157,7 +159,8 @@ void HandlerFilePath(const char* url_path, char* file_path){
   //./wwwroot 这个是随意起的名字，此处对于HTTP服务器的根目录名字是没有明确规定的
   //当前服务器要暴露给客户端的文件必须全部放到这个目录下 ：./wwwroot
   //后期可以使用 gflags 这个库将这个路径改为动态生成的,提高程序的可扩展性
-  sprintf(file_path, "/root/YAB/HttpServer/wwwroot%s", url_path);
+  //TODO
+  sprintf(file_path, "/root/YAB/web_dict/wwwroot/%s", url_path);
   //对于 url_path 还有几种特殊的情况：
   //1.如果url中没有写路径，默认是 /（http服务器的根目录）
   //2.url中写路径了，但是对应的路径是一个目录
@@ -420,6 +423,9 @@ void* ThreadEntry(void *arg){
 
 void HttpServerStart(const char *ip, short port)
 {
+  //忽略掉写管道破裂信号，避免由于客户端在特殊情况下(eg: 等待服务器响应时间过长)而主动断开连接，从而
+  //导致服务器向一个已经关闭的socket信道写数据，导致引发写管道破裂信号强制关闭HTTP服务器进程
+  signal(SIGPIPE, SIG_IGN);
   //创建 tcp socket
   int listen_sock = socket(AF_INET, SOCK_STREAM, 0);
   if(listen_sock < 0){
